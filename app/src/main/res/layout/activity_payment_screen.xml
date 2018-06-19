@@ -132,6 +132,15 @@
             android:textColor="@android:color/white" />
 
 
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/verify_print"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:text="Verify Print"
+            android:textColor="@android:color/white" />
+
+
     </LinearLayout>
 
 

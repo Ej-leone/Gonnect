@@ -97,7 +97,7 @@ public class SyncActivity extends AppCompatActivity {
             @Override
             public void onunchecked(Crypto item) {
 
-                //Todo: Remeber to add
+                //TODO:Figure out
                 //x.remove()
             }
         });
@@ -241,6 +241,7 @@ public class SyncActivity extends AppCompatActivity {
 
     public void Downloadmaan(JSONArray man) {
 
+        Log.e("Error", man.toString());
         final ProgressDialog pdia;
         pdia = new ProgressDialog(SyncActivity.this);
         pdia.setMessage("Downloading Manifest...");
@@ -266,15 +267,16 @@ public class SyncActivity extends AppCompatActivity {
                                     Log.e("Manifest ", ds.length() + " ::" + ds.toString());
 
                                     for (int z = 0; z < ds.length(); z++) {
+                                        //Todo:add retreive other details and change the database
                                         Log.e("manifest details", String.valueOf(z) + ds.getJSONObject(z));
                                         JSONObject mnb = ds.getJSONObject(z).getJSONObject("beneficiary");
                                         String bname = mnb.getString("surname");
                                         String bnatid = mnb.getString("nationalId");
                                         String bamount = ds.getJSONObject(z).getString("totalAmountPayable");
-                                        //String bname = mnb.getString("");
+                                        String manifestid = ds.getJSONObject(z).getString("id");
 
 
-                                        Payment sa = new Payment(orderid, ordername, "", bname, "", "", bnatid, "", "", bamount, "", false, false);
+                                        Payment sa = new Payment(orderid, ordername, "", bname, "", "", bnatid, "", manifestid, bamount, "", false, false);
 
                                         pleg = PaymentLedger.getInstance();
                                         pleg.initiateSale(sa);
@@ -298,6 +300,7 @@ public class SyncActivity extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e("response error", error.toString());
+
                 pdia.dismiss();
             }
         }) {

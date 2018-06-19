@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/lg_bg2"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".IntroActivity">
@@ -13,7 +14,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="50dp"
         android:contentDescription="logo"
-        android:src="@mipmap/ic_launcher" />
+        android:src="@drawable/galaxy_logo" />
 
 
     <LinearLayout
@@ -26,13 +27,7 @@
         android:paddingRight="40dp">
 
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:fontFamily="Segue ui"
-            android:text="Phone"
-            android:textColor="@color/colorPrimary" />
+
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
@@ -40,9 +35,13 @@
 
             <EditText
                 android:id="@+id/input_login"
+                android:background="@drawable/editextbackground"
+                android:drawableLeft="@drawable/ic_perm_device_information_black_24dp"
+                android:drawableStart="@drawable/ic_perm_device_information_black_24dp"
+                android:hint="Device Id"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Phone number"
+                android:padding="10dp"
                 android:inputType="text"
                 android:maxLines="1"
                 android:singleLine="true"
@@ -52,13 +51,7 @@
         </android.support.design.widget.TextInputLayout>
 
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:fontFamily="Segue ui"
-            android:text="Phone"
-            android:textColor="@color/colorPrimary" />
+
         <!-- -->
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
@@ -67,6 +60,10 @@
 
             <EditText
                 android:id="@+id/input_loginpassword"
+                android:background="@drawable/editextbackground"
+                android:drawableLeft="@drawable/ic_lock_outline_black_24dp"
+                android:drawableStart="@drawable/ic_lock_outline_black_24dp"
+                android:padding="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Password"
@@ -84,7 +81,7 @@
             android:layout_height="48dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="40dp"
-            android:background="@color/colorPrimary">
+            android:background="@color/Yellow">
 
             <TextView
                 android:id="@+id/btn_login"

@@ -9,4 +9,7 @@ public class Constants {
     public static String upload_payment = burl + "/synq_to_server/";
 
 
+    public static String confirm_payment = "/ispaid";
+    public static String make_payment = "/payment";
+
 }

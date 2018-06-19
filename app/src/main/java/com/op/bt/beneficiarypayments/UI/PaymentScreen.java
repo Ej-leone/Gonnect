@@ -3,6 +3,7 @@ package com.op.bt.beneficiarypayments.UI;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -11,28 +12,49 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkError;
+import com.android.volley.NoConnectionError;
+import com.android.volley.ParseError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.ServerError;
+import com.android.volley.TimeoutError;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.common.pos.api.util.posutil.PosUtil;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
+import com.op.bt.beneficiarypayments.Data.Constants;
+import com.op.bt.beneficiarypayments.Data.LocalIp;
+import com.op.bt.beneficiarypayments.Data.PrefManager;
 import com.op.bt.beneficiarypayments.Payment.PaymentLedger;
 import com.op.bt.beneficiarypayments.R;
 import com.op.bt.beneficiarypayments.Util.RawToBitMap;
 import com.telpo.tps550.api.printer.UsbThermalPrinter;
 
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 
 
 public class PaymentScreen extends AppCompatActivity implements View.OnClickListener {
@@ -56,6 +78,7 @@ public class PaymentScreen extends AppCompatActivity implements View.OnClickList
     private final int MAKER = 13;
     private final int PRINTPICTURE = 14;
     private final int NOBLACKBLOCK = 15;
+    String Base;
     int rets, bytelength;
     byte[] ISOTmpl = new byte[810];
     byte[] FPTAddr;
@@ -68,7 +91,7 @@ public class PaymentScreen extends AppCompatActivity implements View.OnClickList
     ProgressDialog dialog;
     UsbThermalPrinter mUsbThermalPrinter = new UsbThermalPrinter(PaymentScreen.this);
     MyHandler handler;
-    AppCompatButton init, Collectprint, fin;
+    AppCompatButton init, Collectprint, fin, verify_print;
     TextView name, iden, amount, textPrintVersion;
     ImageView imgv;
     PaymentLedger pledger;
@@ -84,13 +107,31 @@ public class PaymentScreen extends AppCompatActivity implements View.OnClickList
     private int printGray;
     private ProgressDialog progressDialog;
     private String picturePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/111.bmp";
+    String uid;
+    String amont;
+    PrefManager pref;
+    String nm;
+    LocalIp lp = new LocalIp();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //Todo:Cleanup Code
         setContentView(R.layout.activity_payment_screen);
+        pref = new PrefManager(this);
+        init_pres();
+        set_clicks();
+        init_fin();
+        //init_ui();
+        //UpdateUI();
+        //Setup_finger();
 
 
+    }
+
+
+    public void init_pres() {
         init = findViewById(R.id.fin_init);
         Collectprint = findViewById(R.id.collect_print);
         name = findViewById(R.id.tot_name);
@@ -99,28 +140,12 @@ public class PaymentScreen extends AppCompatActivity implements View.OnClickList
         imgv = findViewById(R.id.print_image);
         fin = findViewById(R.id.b_init);
         textPrintVersion = findViewById(R.id.print_version);
+        verify_print = findViewById(R.id.verify_print);
 
         handler = new MyHandler();
+    }
 
-        init.setOnClickListener(this);
-        Collectprint.setOnClickListener(this);
-        fin.setOnClickListener(this);
-
-        init_ui();
-
-
-        // Bundle z = getIntent().getBundleExtra("payment");
-        // String nm = z.getString("name");
-        // String nid = z.getString("nid");
-        // String uid =  z.getString("uid");
-        // String gender = z.getString("gender");
-        // String amont =  z.getString("amount");
-
-
-        //name.setText(nm);
-        // iden.setText(nid);
-        // amount.setText(amont);
-
+    public void Setup_finger() {
 
         try {
             if (PosUtil.setFingerPrintPower(PosUtil.FINGERPRINT_POWER_ON) == 0) {
@@ -131,17 +156,38 @@ public class PaymentScreen extends AppCompatActivity implements View.OnClickList
         } catch (Exception we) {
             we.printStackTrace();
         }
+    }
 
-
+    public void set_clicks() {
+        init.setOnClickListener(this);
+        verify_print.setOnClickListener(this);
+        Collectprint.setOnClickListener(this);
+        fin.setOnClickListener(this);
     }
 
     public void init_ui() {
 
         init.setClickable(false);
         Collectprint.setClickable(false);
+        fin.setClickable(false);
         Collectprint.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
         init.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
+        fin.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
 
+    }
+
+    public void UpdateUI() {
+        Bundle z = getIntent().getBundleExtra("payment");
+        nm = z.getString("name");
+        String nid = z.getString("nid");
+        uid = z.getString("uid");
+        String gender = z.getString("gender");
+        amont = z.getString("amount");
+
+
+        name.setText(nm);
+        iden.setText(nid);
+        amount.setText(amont);
     }
 
     public void init_btn() {
@@ -150,6 +196,16 @@ public class PaymentScreen extends AppCompatActivity implements View.OnClickList
         init.setClickable(true);
 
         init.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+
+    }
+
+
+    public void init_fin() {
+
+
+        fin.setClickable(true);
+
+        fin.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
 
     }
 
@@ -172,21 +228,31 @@ public class PaymentScreen extends AppCompatActivity implements View.OnClickList
         switch (idd) {
             case R.id.b_init:
                 Log.e("Pscreen", "Finialise payment");
-                finishpayment();
+                // finishpayment();
+                Check_Payment();
                 break;
 
             case R.id.collect_print:
                 Log.e("Pscreen", "collect print");
                 ret = com.telpo.usb.finger.Finger.get_image(img_data);
+                Base = Base64.encodeToString(img_data, Base64.NO_WRAP);
+                Toast.makeText(PaymentScreen.this, Base, Toast.LENGTH_SHORT).show();
+                Log.e("Base64String", Base);
+
                 if (ret == 0) {
                     Bitmap bmp = RawToBitMap.convert8bit(img_data, 242, 266);
                     saveImage(bmp);
                     if (bmp != null) {
                         imgv.setImageBitmap(bmp);
+                        init_fin();
                     }
                     return;
                 }
                 Toast.makeText(this, String.format("0x%02x", ret), Toast.LENGTH_SHORT).show();
+
+                break;
+            case R.id.verify_print:
+                Log.e("Verify Print", "collect print");
 
                 break;
 
@@ -611,7 +677,213 @@ public class PaymentScreen extends AppCompatActivity implements View.OnClickList
         }
     }
 
+
+    public void Check_Payment() {
+        final ProgressDialog pdia;
+        //Todo: ceck out this payment Strings
+        pdia = new ProgressDialog(PaymentScreen.this);
+        pdia.setMessage("Confirming payment...");
+        pdia.show();
+
+        JSONObject parameters = new JSONObject();
+        try {
+            parameters.put("manifestId", uid);
+
+
+        } catch (Exception e) {
+        }
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "http://192.168.43.182:8899" + Constants.confirm_payment + "/" + "17", parameters, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                pdia.dismiss();
+                Log.e("onResponse", response.toString());
+
+                try {
+                    boolean succ = response.getBoolean("IsPaidResult");
+
+
+                    // Toast.makeText(PaymentScreen.this, "startingpayment", Toast.LENGTH_LONG).show();
+                    if (!succ) {
+
+                        // Make_Payment();
+                        maaad();
+
+                    } else {
+
+                        Toast.makeText(PaymentScreen.this, "This payment has already been paid", Toast.LENGTH_SHORT).show();
+                        Intent des = new Intent(PaymentScreen.this, Meennuu.class);
+                        startActivity(des);
+                    }
+                } catch (Exception er) {
+                    er.printStackTrace();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                pdia.dismiss();
+                if (error instanceof TimeoutError) {
+                    Toast.makeText(PaymentScreen.this, "Time out error connecting", Toast.LENGTH_SHORT).show();
+                } else if (error instanceof NetworkError) {
+                    Toast.makeText(PaymentScreen.this, "Network connecting" + error.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                } else if (error instanceof ServerError) {
+                    Toast.makeText(PaymentScreen.this, "Server error connecting", Toast.LENGTH_SHORT).show();
+
+                } else if (error instanceof AuthFailureError) {
+                    Toast.makeText(PaymentScreen.this, "Auth Failure connecting", Toast.LENGTH_SHORT).show();
+                } else if (error instanceof ParseError) {
+                    Toast.makeText(PaymentScreen.this, "Parse error connecting", Toast.LENGTH_SHORT).show();
+                } else if (error instanceof NoConnectionError) {
+                    Toast.makeText(PaymentScreen.this, "No connection connecting", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(PaymentScreen.this, error.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+
+                //headers.put("Authorization", "Bearer " + "accesstoken");
+                return headers;
+            }
+        };
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+        queue.add(request);
+    }
+
+
+    public void Make_Payment() {
+        final ProgressDialog pdia;
+        pdia = new ProgressDialog(PaymentScreen.this);
+        pdia.setMessage("making payment...");
+        pdia.show();
+
+
+        JSONObject parameters = new JSONObject();
+        try {
+            parameters.put("manifestId", 19);
+            parameters.put("thumbprint", "Base");
+            parameters.put("paid", true);
+            parameters.put("paidAt", "Anywhere");
+            parameters.put("remarks", "We apreciate you");
+            parameters.put("amountPaid", 122);
+            parameters.put("staffId", 2);
+            parameters.put("staffNames", "pref");
+            parameters.put("beneficiaryNames", "nm");
+
+        } catch (Exception e) {
+        }
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, "http://192.168.43.182:8899" + Constants.make_payment, parameters, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                pdia.dismiss();
+                Log.e("onResponse", response.toString());
+
+                try {
+                    boolean succ = response.getBoolean("PaymentResult");
+
+
+                    Toast.makeText(PaymentScreen.this, "Successfully paid", Toast.LENGTH_LONG).show();
+                    if (succ) {
+
+                        Intent des = new Intent(PaymentScreen.this, Meennuu.class);
+                        startActivity(des);
+                    }
+                } catch (Exception er) {
+                    er.printStackTrace();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                pdia.dismiss();
+                Log.e("onErrorResponse", error.toString());
+
+                if (error instanceof TimeoutError) {
+                    Toast.makeText(PaymentScreen.this, "Time out error connecting", Toast.LENGTH_SHORT).show();
+                } else if (error instanceof NetworkError) {
+                    Toast.makeText(PaymentScreen.this, "Network connecting", Toast.LENGTH_SHORT).show();
+                } else if (error instanceof ServerError) {
+                    Toast.makeText(PaymentScreen.this, "Server error connecting" + error.getLocalizedMessage() + error.toString() + error.getMessage(), Toast.LENGTH_LONG).show();
+
+                } else if (error instanceof AuthFailureError) {
+                    Toast.makeText(PaymentScreen.this, "Auth Failure connecting", Toast.LENGTH_SHORT).show();
+                } else if (error instanceof ParseError) {
+                    Toast.makeText(PaymentScreen.this, "Parse error connecting", Toast.LENGTH_SHORT).show();
+                } else if (error instanceof NoConnectionError) {
+                    Toast.makeText(PaymentScreen.this, "No connection connecting", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(PaymentScreen.this, error.getLocalizedMessage() + error + error.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+
+                //headers.put("Authorization", "Bearer " + "accesstoken");
+                return headers;
+            }
+        };
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+        queue.add(request);
+    }
+
+
+    public void maaad() {
+        final ProgressDialog pdia;
+        pdia = new ProgressDialog(PaymentScreen.this);
+        pdia.setMessage("Trying payment...");
+        pdia.show();
+        JSONObject parameters = new JSONObject();
+        try {
+            parameters.put("manifestId", 19);
+            parameters.put("thumbprint", "Base");
+            parameters.put("paid", true);
+            parameters.put("paidAt", "Anywhere");
+            parameters.put("remarks", "We apreciate you");
+            parameters.put("amountPaid", 122);
+            parameters.put("staffId", 2);
+            parameters.put("staffNames", "pref");
+            parameters.put("beneficiaryNames", "nm");
+
+        } catch (Exception e) {
+        }
+
+        final String reqbody = parameters.toString();
+
+        StringRequest saw = new StringRequest(Request.Method.POST, "http://192.168.43.182:8899" + Constants.make_payment, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.e("Response", response.toString());
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("Error", error.toString());
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("body", reqbody);
+                return params;
+            }
+        };
+
+
+        RequestQueue qu = Volley.newRequestQueue(PaymentScreen.this);
+        qu.add(saw);
+    }
+
 }
+
 
 
 /*

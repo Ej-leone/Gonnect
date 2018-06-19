@@ -37,10 +37,23 @@ public class PrefManager {
      * TODO:Add the is  boolean IS_LOgin =true
      * Create a Login Session
      */
-    public void setNameandPhone(String nm, String Phone, String uid) {
+    public void setUser(String nm, String Photourl, String id) {
         editor.putString("Name", nm);
-        editor.putString("uid", uid);
-        editor.putString("Phone", Phone);
+        editor.putString("uid", id);
+        editor.putString("Photourl", Photourl);
         editor.commit();
+    }
+
+
+    public String GetUSer() {
+        return pref.getString("Name", "User");
+    }
+
+    public String GetPhotourl() {
+        return pref.getString("Photourl", "User");
+    }
+
+    public String Getid() {
+        return pref.getString("uid", "User");
     }
 }

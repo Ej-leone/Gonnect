@@ -1,11 +1,14 @@
 package com.op.bt.beneficiarypayments;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,7 +21,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.op.bt.beneficiarypayments.Data.Constants;
 import com.op.bt.beneficiarypayments.Data.PrefManager;
-import com.op.bt.beneficiarypayments.UI.SyncActivity;
+import com.op.bt.beneficiarypayments.UI.Meennuu;
 
 import org.json.JSONObject;
 
@@ -38,6 +41,13 @@ public class IntroActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_intro);
         init_viws();
+
+        Display d = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        int width = d.getWidth();
+        int height = d.getHeight();
+
+
+        Log.e("bang bang", "width" + String.valueOf(width) + " height:" + String.valueOf(height));
 
     }
 
@@ -87,10 +97,14 @@ public class IntroActivity extends AppCompatActivity {
                     Toast.makeText(IntroActivity.this, desper, Toast.LENGTH_LONG).show();
                     if (succ) {
                         String acctokn = response.getString("accessToken");
+                        String username = response.getString("surname");
+                        String photourl = response.getString("photo");
+                        String uid = response.getString("staffId");
 
                         pref.setAccesstoken(acctokn);
+                        pref.setUser(username, photourl, uid);
 
-                        Intent des = new Intent(IntroActivity.this, SyncActivity.class);
+                        Intent des = new Intent(IntroActivity.this, Meennuu.class);
                         startActivity(des);
                     }
                 } catch (Exception er) {
