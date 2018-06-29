@@ -12,7 +12,7 @@ import java.util.List;
 
 public class AndroidDatabase extends SQLiteOpenHelper implements Database {
 
-    private static final int DATABASE_VERSION = 8;
+    private static final int DATABASE_VERSION = 9;
 
     /**
      * Constructs a new AndroidDatabase.
@@ -27,6 +27,16 @@ public class AndroidDatabase extends SQLiteOpenHelper implements Database {
     public void onCreate(SQLiteDatabase database) {
 
 
+        database.execSQL("CREATE TABLE " + DatabaseContents.TABLE_STAFF + "("
+
+                + "_id INTEGER PRIMARY KEY,"
+
+                + "name VARCHAR,"
+                + "password VARCHAR,"
+
+                + "completed VARCHAR"
+                + ");");
+        Log.d("CREATE DATABASE", "Create " + DatabaseContents.TABLE_PAYMENTS + " Successfully.");
         // this _id is product_id but for update method, it is easier to use name _id
         database.execSQL("CREATE TABLE " + DatabaseContents.TABLE_PAYMENTS + "("
 
@@ -66,6 +76,7 @@ public class AndroidDatabase extends SQLiteOpenHelper implements Database {
         if (newVersion > oldVersion) {
             db.execSQL("DROP TABLE IF EXISTS " + DatabaseContents.TABLE_PAYMENTS);
             db.execSQL("DROP TABLE IF EXISTS " + DatabaseContents.LANGUAGE);
+            db.execSQL("DROP TABLE IF EXISTS " + DatabaseContents.TABLE_STAFF);
         }
         onCreate(db);
     }

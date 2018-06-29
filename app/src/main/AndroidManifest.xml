@@ -36,6 +36,7 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
         <activity
             android:name=".UI.SyncActivity"
@@ -45,16 +46,13 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".UI.PaymentScreen"
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
+            android:launchMode="singleTask"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name=".UI.Meennuu"
             android:label="@string/title_activity_meennuu"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".UI.CardActivity">
-
-        </activity>
+        <activity android:name=".UI.CardActivity"></activity>
     </application>
 
 </manifest>

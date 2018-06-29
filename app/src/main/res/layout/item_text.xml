@@ -1,46 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:padding="20dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="5dp">
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/btn_pay"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="horizontal">
 
+        <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:stretchColumns="*">
+
+            <TableRow>
 
         <TextView
             android:id="@+id/bname"
+            android:layout_margin="15dp"
+            android:text="Brian Mwangi"
+            android:textColor="@color/Black"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:textColor="@color/colorPrimary" />
 
-        <TextView
+            android:textSize="20sp" />
+
+
+                <TextView
+                    android:layout_margin="15dp"
             android:id="@+id/oname"
+                    android:text="30490721"
+                    android:textColor="@color/Blue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/bname"
-            android:textColor="@color/colorPrimary" />
+                    android:textSize="20sp" />
 
 
-        <Button
-            android:id="@+id/btn_pay"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:text="Pay"
-            android:textColor="@color/colorPrimary" />
 
 
         <TextView
             android:id="@+id/amount"
+            android:layout_margin="15dp"
+            android:text="1000"
+            android:textColor="@color/Black"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/btn_pay"
-            android:textColor="@color/colorPrimary" />
+            android:textSize="20sp" />
 
 
-    </RelativeLayout>
+            </TableRow>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray" />
+        </TableLayout>
+
+    </LinearLayout>
 </android.support.v7.widget.CardView>

@@ -1,7 +1,9 @@
 package com.op.bt.beneficiarypayments;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -9,7 +11,10 @@ import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,6 +25,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.op.bt.beneficiarypayments.Data.Constants;
+import com.op.bt.beneficiarypayments.Data.LocalIp;
 import com.op.bt.beneficiarypayments.Data.PrefManager;
 import com.op.bt.beneficiarypayments.UI.Meennuu;
 
@@ -31,8 +37,12 @@ import java.util.Map;
 public class IntroActivity extends AppCompatActivity {
 
     EditText uname, password;
+    Button lip;
+    Switch dd;
     TextView buton;
     PrefManager pref;
+    LocalIp llp;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +50,7 @@ public class IntroActivity extends AppCompatActivity {
         pref = new PrefManager(IntroActivity.this);
 
         setContentView(R.layout.activity_intro);
+        llp = new LocalIp();
         init_viws();
 
         Display d = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
@@ -56,6 +67,59 @@ public class IntroActivity extends AppCompatActivity {
         uname = findViewById(R.id.input_login);
         password = findViewById(R.id.input_loginpassword);
         buton = findViewById(R.id.btn_login);
+        dd = findViewById(R.id.lip_switch);
+        lip = findViewById(R.id.lip_btn);
+
+
+        dd.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b) {
+                    lip.setClickable(true);
+                } else {
+                    lip.setClickable(false);
+                }
+            }
+        });
+
+        lip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                AlertDialog.Builder alert = new AlertDialog.Builder(IntroActivity.this);
+                alert.setTitle("Setting");
+                alert.setMessage("Enter IP:PORT");
+
+                // Set an EditText view to get user input
+                final EditText input = new EditText(IntroActivity.this);
+                alert.setView(input);
+
+
+                alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        String value = input.getText().toString();
+                        Log.d("TAG", "Ip value " + value);
+
+                        llp.setIp(value);
+                        pref.setLocalIP(value);
+
+
+                        //return;
+                    }
+                });
+
+                alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int which) {
+                        // TODO Auto-generated method stub
+                        dialog.dismiss();
+                        //return;
+                    }
+                });
+                alert.show();
+
+            }
+        });
 
 
         buton.setOnClickListener(new View.OnClickListener() {

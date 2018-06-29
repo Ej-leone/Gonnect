@@ -123,23 +123,31 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-        <android.support.v7.widget.AppCompatButton
-            android:id="@+id/collect_print"
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
-            android:text="Collect Print"
-            android:textColor="@android:color/white" />
+            android:orientation="horizontal">
+
+            <android.support.v7.widget.AppCompatButton
+                android:layout_alignParentLeft="true"
+                android:id="@+id/collect_print"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimary"
+                android:text="Collect Print"
+                android:textColor="@android:color/white" />
 
 
-        <android.support.v7.widget.AppCompatButton
-            android:id="@+id/verify_print"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
-            android:text="Verify Print"
-            android:textColor="@android:color/white" />
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/verify_print"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimary"
+                android:text="Verify Print"
+                android:layout_alignParentRight="true"
+                android:textColor="@android:color/white" />
 
+        </RelativeLayout>
 
     </LinearLayout>
 

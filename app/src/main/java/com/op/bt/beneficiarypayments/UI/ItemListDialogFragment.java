@@ -5,11 +5,12 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.op.bt.beneficiarypayments.R;
@@ -27,6 +28,7 @@ public class ItemListDialogFragment extends BottomSheetDialogFragment {
     // TODO: Customize parameter argument names
     private static final String ARG_ITEM_COUNT = "item_count";
     private Listener mListener;
+
 
     // TODO: Customize parameters
     public static ItemListDialogFragment newInstance(int itemCount) {
@@ -47,7 +49,7 @@ public class ItemListDialogFragment extends BottomSheetDialogFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         final RecyclerView recyclerView = (RecyclerView) view;
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
         recyclerView.setAdapter(new ItemAdapter(getArguments().getInt(ARG_ITEM_COUNT)));
     }
 
@@ -75,11 +77,13 @@ public class ItemListDialogFragment extends BottomSheetDialogFragment {
     private class ViewHolder extends RecyclerView.ViewHolder {
 
         final TextView text;
+        final RelativeLayout llt;
 
         ViewHolder(LayoutInflater inflater, ViewGroup parent) {
             // TODO: Customize the item layout
             super(inflater.inflate(R.layout.fragment_item_list_dialog_item, parent, false));
             text = itemView.findViewById(R.id.text);
+            llt = itemView.findViewById(R.id.fitdllyt);
             text.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -108,7 +112,26 @@ public class ItemListDialogFragment extends BottomSheetDialogFragment {
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
-            holder.text.setText(String.valueOf(position));
+            if (position == 0) {
+                holder.text.setText("Paid");
+                holder.llt.setBackgroundColor(getResources().getColor(R.color.Yellow));
+            }
+            if (position == 1) {
+                holder.text.setText("Unpaid");
+                holder.llt.setBackgroundColor(getResources().getColor(R.color.Blue));
+            }
+            if (position == 2) {
+                holder.text.setText("Pending");
+                holder.llt.setBackgroundColor(getResources().getColor(R.color.gray_blue));
+            }
+            if (position == 3) {
+                holder.text.setText("Airtime Sales");
+                holder.llt.setBackgroundColor(getResources().getColor(R.color.Red));
+            }
+
+
+
+
         }
 
         @Override

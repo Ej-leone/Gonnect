@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -44,10 +45,12 @@ import com.op.bt.beneficiarypayments.Data.PrefManager;
 import com.op.bt.beneficiarypayments.Payment.PaymentLedger;
 import com.op.bt.beneficiarypayments.R;
 import com.op.bt.beneficiarypayments.Util.RawToBitMap;
+import com.telpo.tps550.api.TelpoException;
 import com.telpo.tps550.api.printer.UsbThermalPrinter;
 
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -121,11 +124,46 @@ public class PaymentScreen extends AppCompatActivity implements View.OnClickList
         setContentView(R.layout.activity_payment_screen);
         pref = new PrefManager(this);
         init_pres();
-        set_clicks();
+
         init_fin();
-        //init_ui();
-        //UpdateUI();
-        //Setup_finger();
+        init_ui();
+        set_clicks();
+        UpdateUI();
+        Setup_finger();
+
+
+        dialog = new ProgressDialog(PaymentScreen.this);
+        dialog.setTitle(R.string.idcard_czz);
+        dialog.setMessage(getText(R.string.watting));
+        dialog.setCancelable(false);
+        dialog.show();
+
+
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    mUsbThermalPrinter.start(0);
+                    mUsbThermalPrinter.reset();
+                    printVersion = mUsbThermalPrinter.getVersion();
+                } catch (TelpoException e) {
+                    e.printStackTrace();
+                } finally {
+                    if (printVersion != null) {
+                        Message message = new Message();
+                        message.what = PRINTVERSION;
+                        message.obj = "1";
+                        handler.sendMessage(message);
+                    } else {
+                        Message message = new Message();
+                        message.what = PRINTVERSION;
+                        message.obj = "0";
+                        handler.sendMessage(message);
+                    }
+                }
+            }
+        }).start();
 
 
     }
@@ -173,7 +211,8 @@ public class PaymentScreen extends AppCompatActivity implements View.OnClickList
         Collectprint.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
         init.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
         fin.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
-
+        verify_print.setClickable(false);
+        verify_print.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
     }
 
     public void UpdateUI() {
@@ -199,6 +238,12 @@ public class PaymentScreen extends AppCompatActivity implements View.OnClickList
 
     }
 
+    public void init_Verify() {
+
+        verify_print.setClickable(true);
+
+        verify_print.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+    }
 
     public void init_fin() {
 
@@ -235,16 +280,35 @@ public class PaymentScreen extends AppCompatActivity implements View.OnClickList
             case R.id.collect_print:
                 Log.e("Pscreen", "collect print");
                 ret = com.telpo.usb.finger.Finger.get_image(img_data);
-                Base = Base64.encodeToString(img_data, Base64.NO_WRAP);
-                Toast.makeText(PaymentScreen.this, Base, Toast.LENGTH_SHORT).show();
-                Log.e("Base64String", Base);
+
 
                 if (ret == 0) {
                     Bitmap bmp = RawToBitMap.convert8bit(img_data, 242, 266);
+
+                    // byte[] img = new byte[250 * 360];
+                    // int[] wsqlength = new int[252*358];
+                    // Log.e("img_data:", DataProcessUtil.bytesToHexString(img));
+                    //ret = com.telpo.usb.finger.Finger.convert_IMG_to_WSQ(img, wsq_data, wsqlength);
+
+                    // if (ret == 0)
+                    //  {
+                    // Base =  DataProcessUtil.bytesToHexString(wsq_data);
+                    // }
+
+                    // Toast.makeText(PaymentScreen.this, Base, Toast.LENGTH_SHORT).show();
                     saveImage(bmp);
                     if (bmp != null) {
                         imgv.setImageBitmap(bmp);
+
                         init_fin();
+                        init_Verify();
+
+                        en_Step = 2;
+                        ret = com.telpo.usb.finger.Finger.enroll(en_Step, TMPL_No[0], pnDuplNo);
+                        if (ret == 0) {
+                            Toast.makeText(this, "enroll:" + String.format("0x%02x", ret) + "enroll success", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
                     }
                     return;
                 }
@@ -253,6 +317,16 @@ public class PaymentScreen extends AppCompatActivity implements View.OnClickList
                 break;
             case R.id.verify_print:
                 Log.e("Verify Print", "collect print");
+                int[] TMPL_id = new int[1];
+                ret = com.telpo.usb.finger.Finger.get_image(img_data);
+                if (ret == 0) {
+                    ret = com.telpo.usb.finger.Finger.identify(TMPL_id);
+                    if (ret == 0) {
+                        Toast.makeText(this, String.format("0x%02x", ret) + "success，ID:" + TMPL_id[0], Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                }
+                Toast.makeText(this, String.format("0x%02x", ret) + "failed", Toast.LENGTH_SHORT).show();
 
                 break;
 
@@ -693,7 +767,7 @@ public class PaymentScreen extends AppCompatActivity implements View.OnClickList
         } catch (Exception e) {
         }
 
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "http://192.168.43.182:8899" + Constants.confirm_payment + "/" + "17", parameters, new Response.Listener<JSONObject>() {
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, Constants.confirm_payment + "/" + "17", parameters, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 pdia.dismiss();
@@ -706,8 +780,8 @@ public class PaymentScreen extends AppCompatActivity implements View.OnClickList
                     // Toast.makeText(PaymentScreen.this, "startingpayment", Toast.LENGTH_LONG).show();
                     if (!succ) {
 
-                        // Make_Payment();
-                        maaad();
+                        Make_Payment();
+                        //maaad();
 
                     } else {
 
@@ -761,12 +835,23 @@ public class PaymentScreen extends AppCompatActivity implements View.OnClickList
         pdia = new ProgressDialog(PaymentScreen.this);
         pdia.setMessage("making payment...");
         pdia.show();
-
+        String BaseString;
+        try {
+            Bitmap fr = ((BitmapDrawable) imgv.getDrawable()).getBitmap();
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            fr.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            byte[] byteArray = stream.toByteArray();
+            BaseString = Base64.encodeToString(byteArray, Base64.DEFAULT);
+            // Toast.makeText(PaymentScreen.this, BaseString, Toast.LENGTH_LONG).show();
+        } catch (Exception er) {
+            er.printStackTrace();
+            BaseString = er.getLocalizedMessage();
+        }
 
         JSONObject parameters = new JSONObject();
         try {
-            parameters.put("manifestId", 19);
-            parameters.put("thumbprint", "Base");
+            parameters.put("manifestId", 12);
+            parameters.put("thumbprint", BaseString);
             parameters.put("paid", true);
             parameters.put("paidAt", "Anywhere");
             parameters.put("remarks", "We apreciate you");
@@ -777,14 +862,14 @@ public class PaymentScreen extends AppCompatActivity implements View.OnClickList
 
         } catch (Exception e) {
         }
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, "http://192.168.43.182:8899" + Constants.make_payment, parameters, new Response.Listener<JSONObject>() {
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, Constants.make_payment, parameters, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 pdia.dismiss();
                 Log.e("onResponse", response.toString());
 
                 try {
-                    boolean succ = response.getBoolean("PaymentResult");
+                    boolean succ = response.getBoolean("isPaidResult");
 
 
                     Toast.makeText(PaymentScreen.this, "Successfully paid", Toast.LENGTH_LONG).show();
@@ -792,6 +877,8 @@ public class PaymentScreen extends AppCompatActivity implements View.OnClickList
 
                         Intent des = new Intent(PaymentScreen.this, Meennuu.class);
                         startActivity(des);
+                    } else {
+                        Toast.makeText(PaymentScreen.this, "payment Failed", Toast.LENGTH_LONG).show();
                     }
                 } catch (Exception er) {
                     er.printStackTrace();
@@ -858,7 +945,7 @@ public class PaymentScreen extends AppCompatActivity implements View.OnClickList
 
         final String reqbody = parameters.toString();
 
-        StringRequest saw = new StringRequest(Request.Method.POST, "http://192.168.43.182:8899" + Constants.make_payment, new Response.Listener<String>() {
+        StringRequest saw = new StringRequest(Request.Method.POST, Constants.make_payment, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Log.e("Response", response.toString());

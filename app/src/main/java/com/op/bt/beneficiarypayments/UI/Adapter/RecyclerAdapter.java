@@ -8,9 +8,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.op.bt.beneficiarypayments.Payment.Payment;
@@ -67,7 +67,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.viewho
 
             }
         });
-        //todo:add necessary number
+
 
     }
 
@@ -90,7 +90,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.viewho
 
     static class viewholder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView bname, oname, amount;
-        Button pay;
+        LinearLayout pay;
 
 
         public viewholder(View itemView) {

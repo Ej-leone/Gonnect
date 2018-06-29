@@ -29,6 +29,11 @@ public class PrefManager {
         editor.commit();
     }
 
+    public void setLocalIP(String nm) {
+        editor.putString("Lip", nm);
+        editor.commit();
+    }
+
     public String getAccessToken() {
         return pref.getString("at", "User");
     }

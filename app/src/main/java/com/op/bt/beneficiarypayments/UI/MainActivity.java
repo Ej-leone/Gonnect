@@ -1,13 +1,13 @@
 package com.op.bt.beneficiarypayments.UI;
 
 import android.os.Bundle;
-import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
+import android.widget.EditText;
 
 import com.op.bt.beneficiarypayments.Data.NoDaoSetException;
 import com.op.bt.beneficiarypayments.Payment.Payment;
@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
     RecyclerAdapter adapter;
     ArrayList<Payment> all = new ArrayList<>();
     PaymentLedger pledger;
-    TextInputEditText search;
+    EditText search;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
