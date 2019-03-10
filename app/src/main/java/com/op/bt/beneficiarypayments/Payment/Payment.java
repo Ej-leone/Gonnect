@@ -15,9 +15,10 @@ public class Payment {
     private String quantity;
     private Boolean synced;
     private Boolean completed;
+    private String otherdetails;
 
 
-    public Payment(String orderId, String ordername, String benid, String benname, String bencardno, String benbankacc, String bennatid, String gender, String manifestid, String totamount, String quantity, Boolean synced, Boolean completed) {
+    public Payment(String orderId, String ordername, String benid, String benname, String bencardno, String benbankacc, String bennatid, String gender, String manifestid, String totamount, String quantity, Boolean synced, Boolean completed ,String otherdetails) {
         OrderId = orderId;
         Ordername = ordername;
         this.benid = benid;
@@ -31,6 +32,16 @@ public class Payment {
         this.quantity = quantity;
         this.synced = synced;
         this.completed = completed;
+        this.otherdetails = otherdetails;
+    }
+
+
+    public String getOtherdetails() {
+        return otherdetails;
+    }
+
+    public void setOtherdetails(String otherdetails) {
+        this.otherdetails = otherdetails;
     }
 
     public Boolean getSynced() {

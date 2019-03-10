@@ -12,7 +12,7 @@ import java.util.List;
 
 public class AndroidDatabase extends SQLiteOpenHelper implements Database {
 
-    private static final int DATABASE_VERSION = 9;
+    private static final int DATABASE_VERSION = 15;
 
     /**
      * Constructs a new AndroidDatabase.
@@ -37,6 +37,19 @@ public class AndroidDatabase extends SQLiteOpenHelper implements Database {
                 + "completed VARCHAR"
                 + ");");
         Log.d("CREATE DATABASE", "Create " + DatabaseContents.TABLE_PAYMENTS + " Successfully.");
+
+
+        database.execSQL("CREATE TABLE " + DatabaseContents.TABLE_ORDER + "("
+
+                + "_id INTEGER PRIMARY KEY,"
+                + "name VARCHAR (255),"
+                + "location VARCHAR (255),"
+                + "dateoforder VARCHAR (255),"
+                + "available_locally VARCHAR (255),"
+                + "order_id VARCHAR (255)"
+
+                + ");");
+        Log.d("CREATE DATABASE", "Create " + DatabaseContents.TABLE_PAYMENTS + " Successfully.");
         // this _id is product_id but for update method, it is easier to use name _id
         database.execSQL("CREATE TABLE " + DatabaseContents.TABLE_PAYMENTS + "("
 
@@ -54,6 +67,7 @@ public class AndroidDatabase extends SQLiteOpenHelper implements Database {
                 + "quantity VARCHAR,"
                 + "totamount VARCHAR,"
                 + "synced VARCHAR,"
+                + "otherdetails VARCHAR,"
                 + "completed VARCHAR"
                 + ");");
         Log.d("CREATE DATABASE", "Create " + DatabaseContents.TABLE_PAYMENTS + " Successfully.");
@@ -77,6 +91,7 @@ public class AndroidDatabase extends SQLiteOpenHelper implements Database {
             db.execSQL("DROP TABLE IF EXISTS " + DatabaseContents.TABLE_PAYMENTS);
             db.execSQL("DROP TABLE IF EXISTS " + DatabaseContents.LANGUAGE);
             db.execSQL("DROP TABLE IF EXISTS " + DatabaseContents.TABLE_STAFF);
+            db.execSQL("DROP TABLE IF EXISTS " + DatabaseContents.TABLE_ORDER);
         }
         onCreate(db);
     }
@@ -143,6 +158,25 @@ public class AndroidDatabase extends SQLiteOpenHelper implements Database {
     }
 
     @Override
+    public boolean updateOrder(String tableName, String id) {
+        try {
+
+            SQLiteDatabase database = this.getWritableDatabase();
+            ContentValues cont = (ContentValues)  new ContentValues();
+            cont.put("available_locally", "true");
+
+            // this array will always contains only one element.
+            String[] array = new String[]{id + ""};
+            database.update(tableName, cont, "order_id = ?", array);
+            return true;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
     public boolean delete(String tableName, int id) {
         try {
             SQLiteDatabase database = this.getWritableDatabase();
@@ -168,3 +202,8 @@ public class AndroidDatabase extends SQLiteOpenHelper implements Database {
     }
 
 }
+/* onamess VARCHAR,
+                location VARCHAR,
+                dateoforder VARCHAR,
+                 available_locally VARCHAR,
+                 order_id VARCHAR*/

@@ -6,6 +6,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.widget.EditText;
 
@@ -45,6 +46,13 @@ public class MainActivity extends AppCompatActivity {
 
     public void init_ui() {
         all = pledger.ListAll();
+
+        try {
+        Log.e("local", all.get(4).getManifestid());
+        }
+        catch (Exception ee){
+            ee.printStackTrace();
+        }
 
         saw = findViewById(R.id.maaan_rec);
         search = findViewById(R.id.search_edittext);
@@ -88,5 +96,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         return super.onCreateOptionsMenu(menu);
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        //super.onBackPressed();
     }
 }

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".UI.Fragments.Picture">
+
+   <LinearLayout
+       android:id="@+id/ht_lt"
+
+       android:orientation="horizontal"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content">
+
+       <android.support.v7.widget.CardView
+           android:elevation="10dp"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content">
+       <LinearLayout
+           android:orientation="vertical"
+           android:layout_marginLeft="20dp"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content">
+            <TextView
+                android:text="Principal Face Picture"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+           <TextView
+               android:text="Not taken"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content" />
+
+           <ImageView
+               android:id="@+id/pimgview"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:src="@drawable/galaxy_logo"/>
+       </LinearLayout>
+       </android.support.v7.widget.CardView>
+        <android.support.v7.widget.CardView
+            android:elevation="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+       <LinearLayout
+           android:layout_marginRight="20dp"
+           android:orientation="vertical"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content">
+           <TextView
+               android:text="Other Face Picture"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content" />
+           <TextView
+               android:text="Status"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content" />
+
+           <ImageView
+               android:id="@+id/oimgview"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:src="@drawable/galaxy_logo"/>
+       </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+
+   </LinearLayout>
+
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/btn_tp"
+        android:layout_below="@id/ht_lt"
+        android:text="Take Picture"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/btn_upload"
+        android:layout_below="@id/btn_tp"
+        android:text="Upload button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+
+</RelativeLayout>

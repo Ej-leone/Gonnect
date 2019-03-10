@@ -7,6 +7,11 @@
     android:layout_height="match_parent"
     tools:context=".IntroActivity">
 
+    <TextView
+        android:id="@+id/tv_conn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
     <ImageView
         android:id="@+id/imgview_logo"
         android:layout_width="wrap_content"
@@ -85,6 +90,7 @@
 
             <TextView
                 android:id="@+id/btn_login"
+
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
@@ -103,8 +109,18 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true">
 
+        <android.support.v7.widget.AppCompatSpinner
+            android:id="@+id/ws_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:entries="@array/familysizes"
+            android:visibility="gone" />
+
         <Button
             android:id="@+id/lip_btn"
+            android:text="IP"
+            android:background="@color/colorPrimary"
+            android:textColor="@color/White"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
@@ -113,6 +129,7 @@
 
         <Switch
             android:id="@+id/lip_switch"
+            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"

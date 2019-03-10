@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "36612064501",
+    "firebase_url": "https://goodways-206616.firebaseio.com",
+    "project_id": "goodways-206616",
+    "storage_bucket": "goodways-206616.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:36612064501:android:2df7264dbb28b3ce",
+        "android_client_info": {
+          "package_name": "com.op.bt.beneficiarypayments"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "36612064501-hum4r5gcp0o66ckf1nongr0sqtk5pktn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCcWPiNlnhwr9Vixa9nXe1-wsK_t4_XC-g"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

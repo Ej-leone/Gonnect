@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -23,6 +24,10 @@ import com.op.bt.beneficiarypayments.Data.Constants;
 import com.op.bt.beneficiarypayments.Data.Database;
 import com.op.bt.beneficiarypayments.Data.DatabaseExecutor;
 import com.op.bt.beneficiarypayments.Data.PrefManager;
+import com.op.bt.beneficiarypayments.Order.Order;
+import com.op.bt.beneficiarypayments.Order.OrderDao;
+import com.op.bt.beneficiarypayments.Order.OrderDaoAndroid;
+import com.op.bt.beneficiarypayments.Order.OrderLedger;
 import com.op.bt.beneficiarypayments.Payment.Crypto;
 import com.op.bt.beneficiarypayments.Payment.Payment;
 import com.op.bt.beneficiarypayments.Payment.PaymentDao;
@@ -34,6 +39,7 @@ import com.op.bt.beneficiarypayments.UI.Adapter.mnadapter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,24 +50,26 @@ public class SyncActivity extends AppCompatActivity {
     PrefManager re;
     RecyclerView des;
     AppCompatButton btn;
-    ArrayList<Crypto> All_cton = new ArrayList<>();
+    ArrayList<Order> All_cton  = new ArrayList<>();;
     mnadapter desttt;
     // List<String> x = new ArrayList<String>();
     JSONArray x = new JSONArray();
     PaymentLedger pleg;
+    OrderLedger oleg;
     private String accesstoken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
         setContentView(R.layout.activity_sync);
         re = new PrefManager(this);
         accesstoken = re.getAccessToken();
 
         IntiateCoreApp();
+
         initViews();
+
         DownloadOrders();
     }
 
@@ -73,9 +81,18 @@ public class SyncActivity extends AppCompatActivity {
 
         Database database = new AndroidDatabase(this);
         PaymentDao paymentdao = new PaymentDaoAndroid(database);
-        PaymentLedger.setPaymentDao(paymentdao);
-        DatabaseExecutor.setDatabase(database);
+        OrderDao  orderdao  = new OrderDaoAndroid(database);
 
+        PaymentLedger.setPaymentDao(paymentdao);
+        OrderLedger.setOrderDao(orderdao);
+        try {
+            oleg = OrderLedger.getInstance();
+       }
+        catch (Exception e){
+            Log.e("oleg","Cant Get instance");
+            e.printStackTrace();
+        }
+        DatabaseExecutor.setDatabase(database);
 
         Log.d("Core App", "INITIATE");
 
@@ -87,15 +104,17 @@ public class SyncActivity extends AppCompatActivity {
         btn = findViewById(R.id.get_manifest);
         desttt = new mnadapter(All_cton, this, new mnadapter.OnItemCheckListener() {
             @Override
-            public void onchecked(Crypto item) {
+            public void onchecked(Order item) {
 
                 //x.add();
+
                 x.put(item.getId());
+                oleg.update_order(item.getId());
 
             }
 
             @Override
-            public void onunchecked(Crypto item) {
+            public void onunchecked(Order item) {
 
                 //TODO:Figure out
                 //x.remove()
@@ -151,8 +170,14 @@ public class SyncActivity extends AppCompatActivity {
                         String dod = order.getString("dateOfOrder");
                         String name = order.getString("name");
 
-                        Crypto sw = new Crypto(name, id, location, dod);
-                        All_cton.add(sw);
+                        From_Localdatabse();
+                        Order sw = new Order(name, id, location, dod, false);
+                        if(!All_cton.contains(sw))
+                        {
+                            All_cton.add(sw);
+                        }
+
+
                     }
 
                 } catch (Exception rt) {
@@ -195,6 +220,22 @@ public class SyncActivity extends AppCompatActivity {
         startActivity(des);
     }
 
+    public void From_Localdatabse (){
+            try {
+            oleg = OrderLedger.getInstance();
+            }
+            catch (Exception e){
+            Log.e("oleg","Cant Get instance");
+            e.printStackTrace();
+            }
+      // ArrayList<Order> All_ct  = oleg.ListAll();
+      // Log.e("from",  oleg.ListAll().toString());
+       //for( Order oder : All_ct){
+         //   All_cton.add(oder) ;
+      // }
+
+        //Todo:finish up on prevention of double payments
+    }
 
     public void DownloadManifests(List man) {
         JSONObject parameters = new JSONObject();
@@ -244,6 +285,7 @@ public class SyncActivity extends AppCompatActivity {
         Log.e("Error", man.toString());
         final ProgressDialog pdia;
         pdia = new ProgressDialog(SyncActivity.this);
+        pdia.setCancelable(false);
         pdia.setMessage("Downloading Manifest...");
         pdia.show();
         JsonArrayRequest arrayreq = new JsonArrayRequest(Request.Method.POST, Constants.getmanifest_url, man,
@@ -267,32 +309,34 @@ public class SyncActivity extends AppCompatActivity {
                                     Log.e("Manifest ", ds.length() + " ::" + ds.toString());
 
                                     for (int z = 0; z < ds.length(); z++) {
-                                        //Todo:add retreive other details and change the database
-                                        Log.e("manifest details", String.valueOf(z) + ds.getJSONObject(z));
+
+                                        //Log.e("manifest details", String.valueOf(z) + ds.getJSONObject(z));
                                         JSONObject mnb = ds.getJSONObject(z).getJSONObject("beneficiary");
                                         String bname = mnb.getString("surname");
+                                        String oname = mnb.getString("otherNames");
                                         String bnatid = mnb.getString("nationalId");
                                         String bamount = ds.getJSONObject(z).getString("totalAmountPayable");
                                         String manifestid = ds.getJSONObject(z).getString("id");
+                                        String Cardno = mnb.getString("cardNo");
+                                        String BankAcc  = mnb.getString("bankAcc");
+                                        String Gender   = mnb.getString("gender");
+                                        String Benid = mnb.getString("id");
+                                        String OtherDetails  = ds.getJSONObject(z).getJSONObject("other_details").toString();
 
-
-                                        Payment sa = new Payment(orderid, ordername, "", bname, "", "", bnatid, "", manifestid, bamount, "", false, false);
+                                        Log.e("OtherDetails",OtherDetails);
+                                        Payment sa = new Payment(orderid, ordername, Benid , bname + oname, Cardno, BankAcc, bnatid, Gender, manifestid, bamount, "", false, false,OtherDetails);
 
                                         pleg = PaymentLedger.getInstance();
                                         pleg.initiateSale(sa);
                                     }
-
-
+                                //TODo:perevent redownload of manifest by adding a
                                 } catch (Exception er) {
                                     er.printStackTrace();
                                 }
-
                             } catch (Exception rt) {
                                 rt.printStackTrace();
                             }
-
                         }
-
                         pdia.dismiss();
                         movetopayment();
                     }
@@ -315,7 +359,23 @@ public class SyncActivity extends AppCompatActivity {
             }
         };
         RequestQueue mnb = Volley.newRequestQueue(this);
+        arrayreq.setRetryPolicy(new DefaultRetryPolicy(
+                100000 ,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
         mnb.add(arrayreq);
     }
 
+
+    public  void Check_ifalreadydown (Array ar){
+
+
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        //super.onBackPressed();
+    }
 }

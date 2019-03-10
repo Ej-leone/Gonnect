@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".UI.Fragments.BlankFragment">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:text="Alternate Beneficiary Prints"/>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp" />
+            <ImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp" />
+            <ImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp" />
+            <ImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp" />
+            <ImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp" />
+
+        </LinearLayout>
+
+        <TableLayout
+            android:stretchColumns="*"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TableRow
+                android:id="@+id/atr_rt">
+                <TextView android:text="Right thumb"/>
+                <TextView
+                    android:id="@+id/atv_rthumb"
+                    android:text="Status"/>
+            </TableRow>
+            <TableRow
+            android:id="@+id/atr_if">
+                <TextView android:text="Right index Finger"/>
+                <TextView  android:id="@+id/atv_rindexfinger"
+                    android:text="Status"/>
+            </TableRow>
+            <TableRow
+                android:id="@+id/atr_rm">
+                <TextView android:text="Right middle Finger"/>
+                <TextView
+                    android:id="@+id/atv_rmiddlefinger"
+                    android:text="Status"/>
+            </TableRow>
+            <TableRow
+            android:id="@+id/atr_rf">
+                <TextView android:text="Right  Ring Finger"/>
+                <TextView
+                    android:id="@+id/atv_rringfinger"
+                    android:text="Status"/>
+            </TableRow>
+            <TableRow
+                android:id="@+id/atr_pf">
+                <TextView android:text="Right Pinky thumb"/>
+                <TextView
+                    android:id="@+id/atv_rpinkyfinger"
+                    android:text="Status"/>
+            </TableRow>
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/abtn_rhand"
+                android:text="Upload"/>
+        </TableLayout>
+
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp" />
+            <ImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp" />
+            <ImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp" />
+            <ImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp" />
+            <ImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp" />
+
+        </LinearLayout>
+        <TableLayout
+            android:stretchColumns="*"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TableRow
+                android:id="@+id/atr_lt">
+                <TextView android:text="Left thumb"/>
+                <TextView
+                    android:id="@+id/atv_lthumb"
+                    android:text="Status"/>
+            </TableRow>
+            <TableRow
+                android:id="@+id/atr_lif">
+                <TextView android:text="Left index Finger"/>
+                <TextView  android:id="@+id/atv_lindexfinger"
+                    android:text="Status"/>
+            </TableRow>
+            <TableRow
+                android:id="@+id/atr_lmf">
+                <TextView android:text="Left middle Finger"/>
+                <TextView
+                    android:id="@+id/atv_lmiddlefinger"
+                    android:text="Status"/>
+            </TableRow>
+            <TableRow
+                android:id="@+id/atr_lrf">
+                <TextView android:text="left  Ring Finger"/>
+                <TextView
+                    android:id="@+id/atv_lringfinger"
+                    android:text="Status"/>
+            </TableRow>
+            <TableRow
+                android:id="@+id/atr_lpf">
+                <TextView android:text="Left Pinky thumb"/>
+                <TextView
+                    android:id="@+id/atv_lpinkyfinger"
+                    android:text="Status"/>
+            </TableRow>
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/abtn_lhand"
+                android:text="Upload"/>
+        </TableLayout>
+
+
+    </LinearLayout>
+</FrameLayout>

@@ -3,6 +3,7 @@ package com.op.bt.beneficiarypayments.Data;
 import java.util.List;
 
 public interface Database {
+
     /**
      * Selects something in database.
      *
@@ -28,6 +29,17 @@ public interface Database {
      * @return true if updates success ; otherwise false.
      */
     boolean update(String tableName, Object content);
+
+
+
+    /**
+     * Updates something in database.
+     *
+     * @param tableName name of table in database.
+     * @param id   string for using in database.
+     * @return true if updates success ; otherwise false.
+     */
+    boolean updateOrder(String tableName, String id);
 
     /**
      * Deletes something in database.

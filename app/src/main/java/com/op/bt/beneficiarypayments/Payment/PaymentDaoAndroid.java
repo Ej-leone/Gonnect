@@ -29,6 +29,7 @@ public class PaymentDaoAndroid implements PaymentDao {
         content.put("bennatid", payment.getBennatid());
         content.put("gender", payment.getGender());
         content.put("manifestid", payment.getManifestid());
+        content.put("otherdetails",payment.getOtherdetails());
         content.put("totamount", payment.getTotamount());
         content.put("quantity", payment.getQuantity());
         content.put("synced", payment.getSynced().toString());
@@ -67,11 +68,12 @@ public class PaymentDaoAndroid implements PaymentDao {
                             content.getAsString("benbankacc"),
                             content.getAsString("bennatid"),
                             content.getAsString("gender"),
-                            content.getAsString(" manifestid"),
+                            content.getAsString("manifestid"),
                             content.getAsString("totamount"),
-                            content.getAsString(" quantity"),
+                            content.getAsString("quantity"),
                             content.getAsBoolean("synced"),
-                            content.getAsBoolean("completed")
+                            content.getAsBoolean("completed"),
+                            content.getAsString("otherdetails")
 
 
                     )
@@ -116,17 +118,15 @@ public class PaymentDaoAndroid implements PaymentDao {
                             content.getAsString("benbankacc"),
                             content.getAsString("bennatid"),
                             content.getAsString("gender"),
-                            content.getAsString(" manifestid"),
+                            content.getAsString("manifestid"),
                             content.getAsString("totamount"),
-                            content.getAsString(" quantity"),
+                            content.getAsString("quantity"),
                             content.getAsBoolean("synced"),
-                            content.getAsBoolean("completed")
-
-
+                            content.getAsBoolean("completed"),
+                            content.getAsString("otherdetails")
                     )
             );
         }
-
         return list;
     }
 

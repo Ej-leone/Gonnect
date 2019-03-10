@@ -17,6 +17,9 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,6 +37,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.common.pos.api.util.posutil.PosUtil;
+import com.google.gson.JsonObject;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.MultiFormatWriter;
@@ -42,6 +46,7 @@ import com.google.zxing.common.BitMatrix;
 import com.op.bt.beneficiarypayments.Data.Constants;
 import com.op.bt.beneficiarypayments.Data.LocalIp;
 import com.op.bt.beneficiarypayments.Data.PrefManager;
+import com.op.bt.beneficiarypayments.Payment.Payment;
 import com.op.bt.beneficiarypayments.Payment.PaymentLedger;
 import com.op.bt.beneficiarypayments.R;
 import com.op.bt.beneficiarypayments.Util.RawToBitMap;
@@ -55,13 +60,17 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 
 
 public class PaymentScreen extends AppCompatActivity implements View.OnClickListener {
 
+    //TODo:List Add all the other details
 
     private final static int MAX_LEFT_DISTANCE = 255;
     public static String barcodeStr;
@@ -70,7 +79,7 @@ public class PaymentScreen extends AppCompatActivity implements View.OnClickList
     public static String printContent;
     private final int NOPAPER = 3;
     private final int LOWBATTERY = 4;
-    private final int PRINTVERSION = 5;
+   private final int PRINTVERSION = 5;
     private final int PRINTBARCODE = 6;
     private final int PRINTQRCODE = 7;
     private final int PRINTPAPERWALK = 8;
@@ -114,7 +123,14 @@ public class PaymentScreen extends AppCompatActivity implements View.OnClickList
     String amont;
     PrefManager pref;
     String nm;
-    LocalIp lp = new LocalIp();
+
+
+    //Crucial
+    String manifestIDD;
+    String benIDD;
+    String AmountIDD;
+    String natIDD;
+    String otherdetails ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,21 +138,24 @@ public class PaymentScreen extends AppCompatActivity implements View.OnClickList
 
         //Todo:Cleanup Code
         setContentView(R.layout.activity_payment_screen);
-        pref = new PrefManager(this);
-        init_pres();
+       // pref = new PrefManager(this);
+       // init_pres();
 
         init_fin();
         init_ui();
         set_clicks();
-        UpdateUI();
-        Setup_finger();
+        //UpdateUI();
+       Setup_finger();
+       Check_Payment(manifestIDD);
 
 
-        dialog = new ProgressDialog(PaymentScreen.this);
+       dialog = new ProgressDialog(PaymentScreen.this);
         dialog.setTitle(R.string.idcard_czz);
         dialog.setMessage(getText(R.string.watting));
         dialog.setCancelable(false);
         dialog.show();
+
+
 
 
         new Thread(new Runnable() {
@@ -165,8 +184,8 @@ public class PaymentScreen extends AppCompatActivity implements View.OnClickList
             }
         }).start();
 
-
     }
+
 
 
     public void init_pres() {
@@ -188,11 +207,11 @@ public class PaymentScreen extends AppCompatActivity implements View.OnClickList
         try {
             if (PosUtil.setFingerPrintPower(PosUtil.FINGERPRINT_POWER_ON) == 0) {
                 init_btn();
-            } else {
+           } else {
                 Log.e("sdsds", "wese");
-            }
-        } catch (Exception we) {
-            we.printStackTrace();
+           }
+       } catch (Exception we) {
+           we.printStackTrace();
         }
     }
 
@@ -211,24 +230,14 @@ public class PaymentScreen extends AppCompatActivity implements View.OnClickList
         Collectprint.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
         init.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
         fin.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
+        fin.setText("Finish Payment");
         verify_print.setClickable(false);
         verify_print.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
     }
 
-    public void UpdateUI() {
-        Bundle z = getIntent().getBundleExtra("payment");
-        nm = z.getString("name");
-        String nid = z.getString("nid");
-        uid = z.getString("uid");
-        String gender = z.getString("gender");
-        amont = z.getString("amount");
 
 
-        name.setText(nm);
-        iden.setText(nid);
-        amount.setText(amont);
-    }
-
+    //ToDo:Update when paid
     public void init_btn() {
 
 
@@ -274,7 +283,8 @@ public class PaymentScreen extends AppCompatActivity implements View.OnClickList
             case R.id.b_init:
                 Log.e("Pscreen", "Finialise payment");
                 // finishpayment();
-                Check_Payment();
+                //Check_Payment(manifestIDD);
+                Make_Payment(manifestIDD,AmountIDD,nm + ""+ natIDD );
                 break;
 
             case R.id.collect_print:
@@ -285,17 +295,6 @@ public class PaymentScreen extends AppCompatActivity implements View.OnClickList
                 if (ret == 0) {
                     Bitmap bmp = RawToBitMap.convert8bit(img_data, 242, 266);
 
-                    // byte[] img = new byte[250 * 360];
-                    // int[] wsqlength = new int[252*358];
-                    // Log.e("img_data:", DataProcessUtil.bytesToHexString(img));
-                    //ret = com.telpo.usb.finger.Finger.convert_IMG_to_WSQ(img, wsq_data, wsqlength);
-
-                    // if (ret == 0)
-                    //  {
-                    // Base =  DataProcessUtil.bytesToHexString(wsq_data);
-                    // }
-
-                    // Toast.makeText(PaymentScreen.this, Base, Toast.LENGTH_SHORT).show();
                     saveImage(bmp);
                     if (bmp != null) {
                         imgv.setImageBitmap(bmp);
@@ -357,7 +356,23 @@ public class PaymentScreen extends AppCompatActivity implements View.OnClickList
             return;
         }
         lineDistance = Integer.parseInt(exditText);
-        printContent = "About to print this";
+        Calendar calendar = Calendar.getInstance(Locale.getDefault());
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+        int second = calendar.get(Calendar.SECOND);
+        int date = calendar.get(Calendar.DAY_OF_MONTH);
+        int month = calendar.get(Calendar.MONTH);
+        int year = calendar.get(Calendar.YEAR);
+        printContent = "\n---------------------------\n" +
+                "Name:\t"+ nm + "\n"  +
+                "Paid by:\t"+pref.GetUSer()+"\n"+
+                "Amount:\t"+AmountIDD+"\n" +
+                "Date:\t"+ year +":"+ month +":"+ date +"\n"+
+                "Time:\t"+ hour+ ":"+minute+":"+second +"\n" +
+                "ID number:\t"+natIDD+"\n" +
+                "---------------------------\n" +
+                "---------------------------\n" ;
+
         exditText = "2";
         if (exditText == null || exditText.length() < 1) {
             Toast.makeText(PaymentScreen.this, getString(R.string.font_size) + getString(R.string.lengthNotEnougth), Toast.LENGTH_LONG).show();
@@ -752,7 +767,7 @@ public class PaymentScreen extends AppCompatActivity implements View.OnClickList
     }
 
 
-    public void Check_Payment() {
+    public void Check_Payment(String manifestid) {
         final ProgressDialog pdia;
         //Todo: ceck out this payment Strings
         pdia = new ProgressDialog(PaymentScreen.this);
@@ -767,7 +782,7 @@ public class PaymentScreen extends AppCompatActivity implements View.OnClickList
         } catch (Exception e) {
         }
 
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, Constants.confirm_payment + "/" + "17", parameters, new Response.Listener<JSONObject>() {
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, "http://"+ pref.getLocalIP()+Constants.confirm_payment + "/" + manifestid, parameters, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 pdia.dismiss();
@@ -780,14 +795,25 @@ public class PaymentScreen extends AppCompatActivity implements View.OnClickList
                     // Toast.makeText(PaymentScreen.this, "startingpayment", Toast.LENGTH_LONG).show();
                     if (!succ) {
 
-                        Make_Payment();
+                       // Make_Payment(manifestIDD,AmountIDD,benIDD);
+
                         //maaad();
 
                     } else {
 
-                        Toast.makeText(PaymentScreen.this, "This payment has already been paid", Toast.LENGTH_SHORT).show();
-                        Intent des = new Intent(PaymentScreen.this, Meennuu.class);
-                        startActivity(des);
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                fin.setClickable(false);
+                                fin.setBackgroundColor(getResources().getColor(android.R.color.holo_green_light));
+                                fin.setText("Paid");
+                                Toast.makeText(PaymentScreen.this, "This payment has already been paid", Toast.LENGTH_SHORT).show();
+                                Intent des = new Intent(PaymentScreen.this, Meennuu.class);
+                                startActivity(des);
+                                finish();
+                            }
+                        }, 40000);
+
                     }
                 } catch (Exception er) {
                     er.printStackTrace();
@@ -830,7 +856,16 @@ public class PaymentScreen extends AppCompatActivity implements View.OnClickList
     }
 
 
-    public void Make_Payment() {
+    @Override
+    public void onBackPressed() {
+        //super.onBackPressed();
+        Intent Sa = new Intent(PaymentScreen.this ,MainActivity.class);
+        startActivity(Sa);
+        finish();
+
+    }
+
+    public void Make_Payment(String Manifestid , String Amount , String benid) {
         final ProgressDialog pdia;
         pdia = new ProgressDialog(PaymentScreen.this);
         pdia.setMessage("making payment...");
@@ -850,23 +885,26 @@ public class PaymentScreen extends AppCompatActivity implements View.OnClickList
 
         JSONObject parameters = new JSONObject();
         try {
-            parameters.put("manifestId", 12);
+            parameters.put("manifestId", Manifestid);
             parameters.put("thumbprint", BaseString);
             parameters.put("paid", true);
             parameters.put("paidAt", "Anywhere");
             parameters.put("remarks", "We apreciate you");
-            parameters.put("amountPaid", 122);
-            parameters.put("staffId", 2);
-            parameters.put("staffNames", "pref");
-            parameters.put("beneficiaryNames", "nm");
-
+            parameters.put("amountPaid", Amount);
+            parameters.put("staffId", pref.Getid());
+            parameters.put("staffNames", pref.GetUSer());
+            parameters.put("beneficiaryNames", benid);
+            //
         } catch (Exception e) {
         }
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, Constants.make_payment, parameters, new Response.Listener<JSONObject>() {
+
+        Toast.makeText(this, "http://"+ pref.getLocalIP()+Constants.make_payment, Toast.LENGTH_SHORT).show();
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST,"http://"+ pref.getLocalIP()+Constants.make_payment, parameters, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 pdia.dismiss();
                 Log.e("onResponse", response.toString());
+                Toast.makeText(PaymentScreen.this,response.toString() , Toast.LENGTH_SHORT).show();
 
                 try {
                     boolean succ = response.getBoolean("isPaidResult");
@@ -875,8 +913,11 @@ public class PaymentScreen extends AppCompatActivity implements View.OnClickList
                     Toast.makeText(PaymentScreen.this, "Successfully paid", Toast.LENGTH_LONG).show();
                     if (succ) {
 
-                        Intent des = new Intent(PaymentScreen.this, Meennuu.class);
+                        finishpayment();
+
+                        Intent des = new Intent(PaymentScreen.this, SearchActivity.class);
                         startActivity(des);
+                        finish();
                     } else {
                         Toast.makeText(PaymentScreen.this, "payment Failed", Toast.LENGTH_LONG).show();
                     }
@@ -889,10 +930,12 @@ public class PaymentScreen extends AppCompatActivity implements View.OnClickList
             @Override
             public void onErrorResponse(VolleyError error) {
                 pdia.dismiss();
-                Log.e("onErrorResponse", error.toString());
+                Log.e("onErrorResponse",error.toString() );
 
+                Toast.makeText(PaymentScreen.this, error.toString(), Toast.LENGTH_SHORT).show();
                 if (error instanceof TimeoutError) {
                     Toast.makeText(PaymentScreen.this, "Time out error connecting", Toast.LENGTH_SHORT).show();
+                    finishpayment();
                 } else if (error instanceof NetworkError) {
                     Toast.makeText(PaymentScreen.this, "Network connecting", Toast.LENGTH_SHORT).show();
                 } else if (error instanceof ServerError) {
@@ -974,6 +1017,60 @@ public class PaymentScreen extends AppCompatActivity implements View.OnClickList
 
 
 /*
+    public void UpdateUI() {
+        Bundle z = getIntent().getBundleExtra("payment");
+        nm = z.getString("name");
+        String nid = z.getString("nid");
+        uid = z.getString("uid");
+        String gender = z.getString("gender");
+        amont = z.getString("amount");
+        manifestIDD = z.getString("uid");
+        benIDD = z.getString("Benid");
+        AmountIDD = z.getString("amount");
+        natIDD = z.getString("nid");
+        otherdetails = z.getString("otherdetails");
+        JSONObject otherdetailsjson ;
+        try {
+             otherdetailsjson = new JSONObject(otherdetails);
+
+            Iterator<?> keys = otherdetailsjson.keys();
+
+            RelativeLayout rLayout = (RelativeLayout) findViewById(R.id.Relativelayout);
+
+            RelativeLayout.LayoutParams lprams = new RelativeLayout.LayoutParams(
+                    RelativeLayout.LayoutParams.MATCH_PARENT,
+                    RelativeLayout.LayoutParams.MATCH_PARENT);
+
+            TableLayout  tll =  findViewById(R.id.below_table);
+            TableRow row=(TableRow)findViewById(R.id.display_row);
+
+            while( keys.hasNext() ) {
+                String key = (String) keys.next();
+                String Value  = otherdetailsjson.getString(key);
+
+
+               TextView swa =  new TextView(PaymentScreen.this);
+                TextView swb =  new TextView(PaymentScreen.this);
+
+                swa.setText(key);
+                swb.setText(Value);
+
+                row.addView(swa);
+                row.addView(swb);
+
+                tll.addView(row);
+            }
+
+
+        }
+        catch (Exception er ){
+            er.printStackTrace();
+        }
+        name.setText(nm);
+        iden.setText(nid);
+        amount.setText(amont);
+
+    }
 *    try {
             if(PosUtil.setFingerPrintPower(PosUtil.FINGERPRINT_POWER_ON) ==0){
                 init_btn();

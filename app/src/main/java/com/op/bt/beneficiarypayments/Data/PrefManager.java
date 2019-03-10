@@ -34,10 +34,34 @@ public class PrefManager {
         editor.commit();
     }
 
+
+    public void Set_locals (Boolean ww){
+        editor.putBoolean("itwere", ww);
+        editor.commit();
+    }
+
+    public Boolean Get_locals() {
+        return pref.getBoolean("itwere", false);
+    }
+
+    public String getLocalIP() {
+        return pref.getString("Lip", "192.168.1.49");
+    }
+
     public String getAccessToken() {
         return pref.getString("at", "User");
     }
 
+
+
+    public void SetFamilySize (int z){
+        editor.putInt("setfamilysize",z);
+    }
+
+
+    public int getFamilySize (){
+        return pref.getInt("setfamilysize",0);
+    }
     /**
      * TODO:Add the is  boolean IS_LOgin =true
      * Create a Login Session
@@ -59,6 +83,6 @@ public class PrefManager {
     }
 
     public String Getid() {
-        return pref.getString("uid", "User");
+        return pref.getString("uid", "2");
     }
 }

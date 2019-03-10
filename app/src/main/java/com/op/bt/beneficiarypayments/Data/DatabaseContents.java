@@ -4,6 +4,7 @@ public enum DatabaseContents {
 
     DATABASE("bt.beneficiary.db1"),
     TABLE_PAYMENTS("payments"),
+    TABLE_ORDER("orders"),
     TABLE_STAFF("staff"),
     LANGUAGE("language");
 

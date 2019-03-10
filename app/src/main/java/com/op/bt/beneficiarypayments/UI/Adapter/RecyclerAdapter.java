@@ -46,6 +46,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.viewho
         final Payment strbucks = dester.get(position);
 
         Log.e("dss", String.valueOf(dester.size()));
+        Log.e("Starbucks", strbucks.getManifestid());
         holder.bname.setText(strbucks.getBenname());
         holder.amount.setText(strbucks.getTotamount());
         holder.oname.setText(strbucks.getBennatid());
@@ -62,7 +63,11 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.viewho
                 nw.putString("uid", strbucks.getManifestid());
                 nw.putString("gender", strbucks.getGender());
                 nw.putString("amount", strbucks.getTotamount());
+                nw.putString("Benid",strbucks.getBenid());
+                nw.putString("otherdetails", strbucks.getOtherdetails());
                 sa.putExtra("payment", nw);
+
+                Log.e("ManifestId",strbucks.getManifestid());
                 ctx.startActivity(sa);
 
             }

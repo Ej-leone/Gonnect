@@ -29,8 +29,8 @@ public class CustomFilter extends Filter {
             //STORE OUR FILTERED PLAYERS
             ArrayList<Payment> filteredPlayers = new ArrayList<>();
             for (int i = 0; i < filterList.size(); i++) {
-                //Todo:add manifest id to check etc
-                if (filterList.get(i).getBenname().toUpperCase().contains(charSequence) || filterList.get(i).getBenid().toUpperCase().contains(charSequence)) {
+
+                if (filterList.get(i).getBenname().toUpperCase().contains(charSequence) || filterList.get(i).getBennatid().toUpperCase().contains(charSequence) || filterList.get(i).getTotamount().toUpperCase().contains(charSequence)) {
                     //ADD PLAYER TO FILTERED PLAYERS
                     filteredPlayers.add(filterList.get(i));
                 }
